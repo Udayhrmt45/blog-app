@@ -12,6 +12,7 @@ const Post = require("./models/Post");
 const path = require("path");
 const { error } = require("console");
 const app = express();
+const port = process.env.PORT || 4000;
 require("dotenv").config();
 
 const saltRounds = 10;
@@ -149,4 +150,4 @@ app.delete("/post/:id", async (req, res) => {
   }
 });
 
-app.listen(4000);
+app.listen(port);
