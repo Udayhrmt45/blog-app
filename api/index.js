@@ -12,6 +12,7 @@ const Post = require("./models/Post");
 const path = require("path");
 const { error } = require("console");
 const app = express();
+require("dotenv").config();
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
@@ -22,9 +23,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(__dirname + "/uploads"));
 
-mongoose.connect(
-  "mongodb+srv://hiremathuday68:blog@cluster0.ys4d7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-);
+mongoose.connect(process.env.CONN_STRING);
 
 app.post("/Register", async (req, res) => {
   const { username, password } = req.body;
