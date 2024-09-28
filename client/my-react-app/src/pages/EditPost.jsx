@@ -12,7 +12,7 @@ export default function EditPost() {
   const [deleted,setDelete] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:4000/post/'+id)
+    fetch('https://mern-myblogapp.onrender.com/post/'+id)
     .then(response => {
        response.json().then(postInfo =>{
         setTitle(postInfo.title);
@@ -32,7 +32,7 @@ export default function EditPost() {
     if(files?.[0]){
         data.set("file", files?.[0]);
     }
-    const response = await fetch('http://localhost:4000/post',{
+    const response = await fetch('https://mern-myblogapp.onrender.com/post',{
       method: 'PUT',  
       body: data,
       credentials:'include',
@@ -44,7 +44,7 @@ export default function EditPost() {
 
   async function deletePost(ev){
     ev.preventDefault();
-    const response = await fetch(`http://localhost:4000/post/${id}`,{
+    const response = await fetch(`https://mern-myblogapp.onrender.com/post/${id}`,{
         method:'DELETE',
     })
     if(response.ok){
