@@ -18,7 +18,7 @@ const secret = process.env.SECRET;
 const app = express();
 
 const allowedOrigins = process.env.NODE_ENV === 'production' 
-  ? ['https://your-render-frontend-url.onrender.com'] 
+  ? ['https://blog-app-ardu.onrender.com'] 
   : ['http://localhost:5173'];
 
 app.use(cors({
@@ -47,11 +47,9 @@ app.use("/uploads", express.static(uploadsDir));
 // MongoDB connection
 mongoose.connect(process.env.CONN_STRING, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.log('MongoDB connection error:', err));
-
+.then(() => console.log('MongoDB connected successfully'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 app.post("/Register", async (req, res) => {
   const { username, password } = req.body;
