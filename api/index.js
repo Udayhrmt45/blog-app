@@ -5,26 +5,53 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const multer = require("multer");
-const uploadMiddleware = multer({ dest: "uploads/" });
 const fs = require("fs");
 const User = require("./models/user");
 const Post = require("./models/Post");
 const path = require("path");
-const { error } = require("console");
-const app = express();
-const port = process.env.PORT || 4000;
 require("dotenv").config();
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
 const secret = process.env.SECRET;
 
-app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
+const app = express();
+
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? ['https://your-render-frontend-url.onrender.com'] 
+  : ['http://localhost:5173'];
+
+app.use(cors({
+  credentials: true,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}));
+
 app.use(express.json());
 app.use(cookieParser());
-app.use("/uploads", express.static(__dirname + "/uploads"));
 
-mongoose.connect(process.env.CONN_STRING);
+// Configure file uploads
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+const uploadMiddleware = multer({ dest:uploadsDir });
+app.use("/uploads", express.static(uploadsDir));
+
+
+// MongoDB connection
+mongoose.connect(process.env.CONN_STRING, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.log('MongoDB connection error:', err));
+
 
 app.post("/Register", async (req, res) => {
   const { username, password } = req.body;
@@ -150,4 +177,21 @@ app.delete("/post/:id", async (req, res) => {
   }
 });
 
-app.listen(port);
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+  });
+}
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+const port = process.env.PORT || 4000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
