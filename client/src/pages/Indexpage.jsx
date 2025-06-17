@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import Post from "../post";
+import { API_BASE_URL } from "../lib/constant.js";
 
 export default function IndexPage() {
   const [posts,setPosts] = useState([]);
   useEffect(()=>{
-    fetch('http://localhost:4000/post').then(response =>{
+    fetch(`${API_BASE_URL}/post`).then(response =>{
       response.json().then(posts =>{
         setPosts(posts);
       });

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_BASE_URL } from "../lib/constant.js";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -6,7 +7,7 @@ export default function RegisterPage() {
 
   async function register(event){
     event.preventDefault();
-    const response = await fetch('http://localhost:4000/Register',{
+    const response = await fetch(`${API_BASE_URL}/Register`,{
       method:'POST',
       body: JSON.stringify({username,password}),
       headers:{'content-Type':'application/json'},
